@@ -31,4 +31,30 @@
 # include <fstream>
 # include <map>
 
+enum e_errors {
+	INVALID		= -1,
+	NEGATIVE	= -2,
+	TOO_LARGE	= -3
+};
+
+class parsingError : public std::exception
+{
+
+public:
+
+	parsingError ( std::string const, int);
+	virtual ~parsingError ( void ) throw();
+
+	const char * what () const throw();
+
+private:
+
+	parsingError ( void );
+
+	const std::string	file_;
+	int					line_;
+
+
+};
+
 #endif

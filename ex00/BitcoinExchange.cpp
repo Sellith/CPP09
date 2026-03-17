@@ -26,3 +26,14 @@
 
 #include "BitcoinExchange.hpp"
 
+parsingError::parsingError ( std::string const file, int line ) :
+	file_(file),
+	line_(line) {}
+
+const char *	parsingError::what() const throw() {
+	std::string	msg;
+	msg = "Parsing error detected in " + file_ + std::to_string(line_);
+	return (msg.c_str());
+}
+
+parsingError::~parsingError ( void ) {}
