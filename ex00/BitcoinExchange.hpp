@@ -45,10 +45,12 @@ class parsingError : public std::exception
 
 public:
 
-	parsingError ( std::string const, int);
+	parsingError ( std::string const, int, std::string const);
 	virtual ~parsingError ( void ) throw();
 	const char *	what ( void ) const throw();
 	int				getLine ( void ) const;
+	std::string		getFile ( void ) const;
+	std::string		getError ( void ) const;
 
 private:
 
@@ -56,6 +58,7 @@ private:
 
 	const std::string	file_;
 	int					line_;
+	const std::string	error_;
 
 
 };

@@ -84,15 +84,22 @@ static std::map<std::string, int> dataParsing ( std::ifstream & p_data )
 	std::string					ctn;
 	std::string					buf;
 	std::map<std::string, int>	data;
-	int							line = 0;
+	int							line = 2;
 	int							dateLen;
 
 	getline(p_data,ctn);
 	while (getline(p_data, ctn)) {
 		dateLen = dateChecking(ctn);
 		if (dateLen == INVALID)	
-			throw (parsingError("data.csv", line));
+			throw (parsingError("data.csv", line, ctn));
 		else {
+			int	decimal = 0;
+			for (std::string::iterator it = ctn.begin() + dateLen + 1; it != ctn.end(); it++) {
+				if (*it == '.')
+					decimal++;
+				if ((!std::isdigit(*it) && *it != '.') || (*it == '.'  && decimal > 1))
+					throw (parsingError("data.csv", line, ctn));
+			}
 			buf = ctn;
 			buf.erase(dateLen);
 			data[buf] = std::atoi(ctn.c_str() + dateLen + 1);
@@ -121,7 +128,7 @@ int main ( int ac, char **av )
 		std::map<std::string, int> dataMap = dataParsing(data);
 	}
 	catch (parsingError &e) {
-		std::cout << e.what() << " at line " << e.getLine() << std::endl;
+		std::cout << e.what() << " in " << e.getFile() << " at line " << e.getLine() << " : " << e.getError() << std::endl;
 		return (1);
 	}
 	// Opening import file and getting fd
