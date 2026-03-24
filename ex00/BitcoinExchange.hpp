@@ -28,6 +28,9 @@
 # define BITCOINEXCHANGE_HPP
 
 # include <iostream>
+# include <algorithm>
+# include <cstring>
+# include <cstdlib>
 # include <fstream>
 # include <map>
 
@@ -44,8 +47,8 @@ public:
 
 	parsingError ( std::string const, int);
 	virtual ~parsingError ( void ) throw();
-
-	const char * what () const throw();
+	const char *	what ( void ) const throw();
+	int				getLine ( void ) const;
 
 private:
 

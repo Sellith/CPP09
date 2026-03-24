@@ -24,8 +24,6 @@
 /*                                                                                                                 */
 /* *************************************************************************************************************** */
 
-
-
 #include "BitcoinExchange.hpp"
 
 static int dateChecking ( std::string date )
@@ -36,62 +34,74 @@ static int dateChecking ( std::string date )
 	int	year;
 	int	month;
 	int	day;
-	int len;
+	int len = 0;
 
-	while (date[len] != '-') {
+	while (date[len] != '-' && date[len]) {
 		if (!std::isdigit(date[len]))
 			return (INVALID);
 		strYear += date[len++];
 	}
-	year = atoi(strYear.c_str());
+	if (!date[len])
+		return (INVALID);
+	year = std::atoi(strYear.c_str());
 	len++;
-	while (date[len] != '-') {
+	while (date[len] != '-'  && date[len]) {
 		if (!std::isdigit(date[len]))
 			return (INVALID);
 		strMonth += date[len++];
 	}
-	month = atoi(strMonth.c_str());
-	if (month > 12)
+	month = std::atoi(strMonth.c_str());
+	if (month > 12 || month < 1 || !date[len])
 		return (INVALID);
 	len++;
-	while (date[len] != ',') {
+	while (date[len] != ','  && date[len]) {
 		if (!std::isdigit(date[len]))
 			return (INVALID);
-		strDay += date[len];
+		strDay += date[len++];
 	}
-	day = atoi(strDay.c_str());
+	if (!date[len])
+		return (INVALID);
+	day = std::atoi(strDay.c_str());
 
 	int		year_nonleap[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	int 	year_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	bool	is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 
 	if ( !is_leap ) {
-		if (year_nonleap[month - 1] < day)
+		if (day < 1 || year_nonleap[month - 1] < day)
 			return (INVALID);
 	}
 	else
-		if (year_leap[month - 1] < day)
+		if (day < 1 || year_leap[month - 1] < day)
 			return (INVALID);
 			
 	return (len);
 }
 
 
-static std::map<std::string, int> dataParsing ( std::ifstream & data )
+static std::map<std::string, int> dataParsing ( std::ifstream & p_data )
 {
 	std::string					ctn;
-	std::map<std::string, int>	Map;
-	int							val;
+	std::string					buf;
+	std::map<std::string, int>	data;
 	int							line = 0;
 	int							dateLen;
-	
-	while (getline(data, ctn)) {
+
+	getline(p_data,ctn);
+	while (getline(p_data, ctn)) {
 		dateLen = dateChecking(ctn);
 		if (dateLen == INVALID)	
 			throw (parsingError("data.csv", line));
+		else {
+			buf = ctn;
+			buf.erase(dateLen);
+			data[buf] = std::atoi(ctn.c_str() + dateLen + 1);
+		}
 		line++;
 	}
-	return (Map);
+	for (std::map<std::string, int>::iterator it = data.begin(); it != data.end(); it++)
+		std::cout << it->first << " value : " << it->second << std::endl; 
+	return (data);
 }
 
 int main ( int ac, char **av )
@@ -99,7 +109,7 @@ int main ( int ac, char **av )
 	using	std::cout;
 
 	if ( ac != 2 ) {
-		cout << "Fatatl error : btc takes one .txt arg\n";
+		cout << "Fatal error : btc takes one '.txt' arg\n";
 		return 1;
 	}
 	/* ARG AND FILES CHECKING  */
@@ -111,7 +121,7 @@ int main ( int ac, char **av )
 		std::map<std::string, int> dataMap = dataParsing(data);
 	}
 	catch (parsingError &e) {
-		std::cout << e.what() << std::endl;
+		std::cout << e.what() << " at line " << e.getLine() << std::endl;
 		return (1);
 	}
 	// Opening import file and getting fd

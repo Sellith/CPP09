@@ -31,9 +31,10 @@ parsingError::parsingError ( std::string const file, int line ) :
 	line_(line) {}
 
 const char *	parsingError::what() const throw() {
-	std::string	msg;
-	msg = "Parsing error detected in " + file_ + std::to_string(line_);
+	std::string	msg = "Parsing error detected in " + file_;
 	return (msg.c_str());
 }
 
-parsingError::~parsingError ( void ) {}
+parsingError::~parsingError ( void ) throw() {}
+
+int	parsingError::getLine ( void ) const {return(line_);}
