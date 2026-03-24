@@ -26,7 +26,7 @@
 
 #include "BitcoinExchange.hpp"
 
-static int dateChecking ( std::string date )
+static int dateChecking ( std::string date, char separation)
 {
 	std::string	strYear;
 	std::string	strMonth;
@@ -54,7 +54,7 @@ static int dateChecking ( std::string date )
 	if (month > 12 || month < 1 || !date[len])
 		return (INVALID);
 	len++;
-	while (date[len] != ','  && date[len]) {
+	while (date[len] != separation  && date[len]) {
 		if (!std::isdigit(date[len]))
 			return (INVALID);
 		strDay += date[len++];
@@ -78,18 +78,17 @@ static int dateChecking ( std::string date )
 	return (len);
 }
 
-
-static std::map<std::string, int> dataParsing ( std::ifstream & p_data )
+static std::map<std::string, float> dataParsing ( std::ifstream & p_data )
 {
-	std::string					ctn;
-	std::string					buf;
-	std::map<std::string, int>	data;
-	int							line = 2;
-	int							dateLen;
+	std::string						ctn;
+	std::string						buf;
+	std::map<std::string, float>	data;
+	int								line = 2;
+	int								dateLen;
 
 	getline(p_data,ctn);
 	while (getline(p_data, ctn)) {
-		dateLen = dateChecking(ctn);
+		dateLen = dateChecking(ctn, ',');
 		if (dateLen == INVALID)	
 			throw (parsingError("data.csv", line, ctn));
 		else {
@@ -102,13 +101,71 @@ static std::map<std::string, int> dataParsing ( std::ifstream & p_data )
 			}
 			buf = ctn;
 			buf.erase(dateLen);
-			data[buf] = std::atoi(ctn.c_str() + dateLen + 1);
+			data[buf] = std::strtof((ctn.c_str() + dateLen + 1), NULL);
 		}
 		line++;
 	}
-	for (std::map<std::string, int>::iterator it = data.begin(); it != data.end(); it++)
-		std::cout << it->first << " value : " << it->second << std::endl; 
 	return (data);
+}
+
+static void	algorithm ( std::map<std::string, float> p_data, std::string p_infDate, float p_value )
+{
+	(void)p_data;
+	switch (static_cast<int>(p_value))
+	{
+	case INVALID:
+		std::cout << "Error: bad input => " << p_infDate << "\n";
+		return ;
+	case NEGATIVE:
+		std::cout << "Error: not a positive number" << "\n";
+		return ;
+	case TOO_LARGE:
+		std::cout << "Error: too large of a number" << "\n";
+		return ;
+	default:
+		std::cout << p_infDate << " => " << p_value << "\n";
+	}
+}
+
+static void	infileParsing ( std::ifstream & p_ifs, std::map<std::string, float> p_data )
+{
+	std::string	ctn;
+	std::string	buf;
+	int			dateLen;
+	float		val;
+	
+	while (getline(p_ifs, ctn)) {
+		dateLen = dateChecking(ctn, ' ');
+		val = std::strtof((ctn.c_str() + dateLen + 3), NULL);
+		if (val > 1000.0f) 
+			val = TOO_LARGE;
+		else if (val < 0.0f)
+			val = NEGATIVE;
+		if (val < 0) {
+			algorithm(p_data, ctn, val);
+			continue ;
+		}
+		if (dateLen == INVALID || ctn[dateLen + 1] != '|' || ctn[dateLen + 2] != ' ') {
+			val = INVALID;
+			algorithm(p_data, ctn, val);
+			continue ;
+		}
+		int	decimal = 0;
+		int symbol = 0;
+		for (std::string::iterator it = ctn.begin() + dateLen + 3; it != ctn.end(); it++) {
+			if (*it == '-')
+				symbol++;
+			if (*it == '.')
+				decimal++;
+			if ((!std::isdigit(*it) && *it != '.') || (*it == '.'  && decimal > 1) || ((*it == '-' || *it == '+') && symbol > 1))
+				val = INVALID;
+		}
+		buf = ctn;
+		if (val != INVALID)
+			buf.erase(dateLen);
+		algorithm(p_data, buf, val);
+	}
+	return ;
 }
 
 int main ( int ac, char **av )
@@ -121,18 +178,24 @@ int main ( int ac, char **av )
 	}
 	/* ARG AND FILES CHECKING  */
 
-	/* Opening and parsing of data.csv and putting the result in dataMap */
-
+	/* Opening and parsing of data.csv and the file taken in argv[1] and putting the result in dataMap */
 	std::ifstream	data("data.csv");
+	if (!data.is_open()) {
+		std::cout << "Fatal error : couldn't open data.csv" << std::endl;
+		return (1);
+	}
+	std::ifstream	ifs(av[1]);
+	if (!ifs.is_open()) {
+		std::cout << "Fatal error : couldn't open " << av[1] << std::endl;
+		return (1);
+	}	
 	try {
-		std::map<std::string, int> dataMap = dataParsing(data);
+		std::map<std::string, float>	dataMap = dataParsing(data);
+		infileParsing(ifs, dataMap);
 	}
 	catch (parsingError &e) {
 		std::cout << e.what() << " in " << e.getFile() << " at line " << e.getLine() << " : " << e.getError() << std::endl;
 		return (1);
 	}
-	// Opening import file and getting fd
-	std::ifstream	ifs(av[1]);
-
-	
+	return (0);
 }
