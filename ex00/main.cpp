@@ -122,9 +122,15 @@ static void	algorithm ( std::map<std::string, float> p_data, std::string p_infDa
 	case TOO_LARGE:
 		std::cout << "Error: too large of a number" << "\n";
 		return ;
-	default:
-		std::cout << p_infDate << " => " << p_value << "\n";
 	}
+	for (std::map<std::string, float>::iterator it = p_data.begin(); it != p_data.end(); it++) {
+		if (std::strcmp(it->first.c_str(), p_infDate.c_str()) > 0) {
+			it--;
+			std::cout << p_infDate << " => " << p_value << " = " << it->second * p_value << "\n";
+			return ;
+		}
+	}
+
 }
 
 static void	infileParsing ( std::ifstream & p_ifs, std::map<std::string, float> p_data )
