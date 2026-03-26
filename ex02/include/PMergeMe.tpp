@@ -47,8 +47,14 @@ static T<std::pair<int, int>, std::allocator<std::pair<int, int> > >
 template <template <class, class> class T>
 void	mergeInsertion ( T<int, std::allocator<int> > container )
 {
-	T<std::pair<int, int>, std::allocator<std::pair<int, int> > > pairs = pairing<T>(container);
+	T<std::pair<int, int>, std::allocator<std::pair<int, int> > >	pairs = pairing<T>(container);
+	T<int, std::allocator<int> >									lastValue;
+	if (container.size() % 2)
+		lastValue.push_back(container.back());
+	
 	for (typename T<std::pair<int, int>, std::allocator<std::pair<int, int> > >::const_iterator it = pairs.begin(); it != pairs.end(); it++) {
 		std::cout << "first: " << it->first << " second: " << it->second << std::endl;
 	}
+	if (container.size() % 2)
+		std::cout << lastValue << std::endl;
 }
