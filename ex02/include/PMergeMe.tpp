@@ -30,6 +30,50 @@
 #define T_INT	T<int, std::allocator<int> >
 #define T_INTCT	T<int, std::allocator<int> >::const_iterator
 
+
+/* -------------------------------------------------- */
+/* ---------------- Class definition ---------------- */
+/* -------------------------------------------------- */
+
+template <template <class, class> class T>
+PMergeMe<T>::PMergeMe ( void ) {}
+
+template <template <class, class> class T>
+PMergeMe<T>::PMergeMe ( char * array ) 
+{
+	std::stringstream	ss(array);
+	std::string			tmp;
+
+	while (getline(ss, tmp, ' ')) {
+		if (!tmp.empty()) {
+			cont_.push_back(atoi(tmp.c_str()));
+		}
+	}
+}
+
+template <template <class, class> class T>
+PMergeMe<T>::PMergeMe ( T<int, std::allocator<int> > const & other ) 
+	: cont_(other) {}
+
+template <template <class, class> class T>
+PMergeMe<T>::PMergeMe ( PMergeMe const & other ) 
+	: cont_(other.cont_) {}
+
+template <template <class, class> class T>
+PMergeMe<T>::~PMergeMe ( void ) {}
+
+template <template <class, class> class T>
+PMergeMe<T> &	PMergeMe<T>::operator= ( PMergeMe const & other )
+{
+	if ( this != &other )
+		cont_ = other.cont_;
+	return ( *this );
+}
+
+/* --------------------------------------------------- */
+/* ---------------- Utility functions ---------------- */
+/* --------------------------------------------------- */
+
 template <typename Iterator>
 Iterator	nextIt ( Iterator current ) {
 	Iterator next(current);
@@ -44,23 +88,41 @@ Iterator	prevIt ( Iterator current ) {
 	return ( prev );
 }
 
-template <typename T>
-static void	forEach ( T begin, T end, void(*f)(T) )
+template <typename Iterator>
+static void	forEach ( Iterator begin, Iterator end, void(*f)(Iterator) )
 {
-	T it = begin;
+	Iterator it = begin;
 	while (it != end) {
 		f(it);
 		it++;
 	}
 }
 
-template <typename T>
-static void	pairSwap ( T it )
+template <typename Iterator>
+static void	pairSwap ( Iterator it )
 {
 	if (it->first > it->second)
 		std::swap(it->first, it->second);
 }
+/* ----------------------------------------------- */
+/* ---------------- Class methods ---------------- */
+/* ----------------------------------------------- */
 
+template <template <class, class> class T>
+T<int, std::allocator<int> >	PMergeMe<T>::getCont ( void ) 
+{return (cont_);}
+
+template <template <class, class> class T>
+T<int, std::allocator<int> >	PMergeMe<T>::getSorted ( void ) 
+{return (sorted_);}
+
+template <template <class, class> class T>
+time_t	PMergeMe<T>::getBeginTime ( void ) 
+{return (begin_);}
+
+template <template <class, class> class T>
+void	PMergeMe<T>::insertContent ( T<int, std::allocator<int> > const & ctn )
+{cont_ = ctn;}
 
 /* 
 	@brief The goal of this function is to recursively create new pairs, to sort them, 
@@ -83,19 +145,16 @@ static void pairing( T_INT & container )
 		mainCont.push_back(it->second);
 		pendCont.push_back(it->first);
 	}
-	std::cout << "mainCont is : " << mainCont << std::endl;
-	std::cout << "pendCont is : " << pendCont << std::endl;
 	if (mainCont.size() > 2)
 		pairing(mainCont);
 	else {
 		std::swap(mainCont.front(), mainCont.back());
-		std::cout << mainCont <<std::endl;
 	}
 
 }
 
 template <template <class, class> class T>
-void	fordJohnsonSort ( T<int, std::allocator<int> > & container )
+void	PMergeMe<T>::fordJohnsonSort ( void )
 {
-	pairing<T>(container);
+	pairing<T>(cont_);
 }

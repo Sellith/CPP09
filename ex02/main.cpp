@@ -39,19 +39,8 @@ int	main ( int ac, char ** av )
 	if (!valChecking(av[1]))
 		return (1);
 
-	std::stringstream	ss(av[1]);
-	std::vector<int>	vec;
-	std::list<int>		lst;
-	std::string			tmp;
+	PMergeMe<std::vector>	a(av[1]);
 
-	while (getline(ss, tmp, ' ')) {
-		if (!tmp.empty()) {
-			vec.push_back(atoi(tmp.c_str()));
-			lst.push_back(atoi(tmp.c_str()));
-		}
-	}
-	std::cout << "Before: " << vec << std::endl;
-	fordJohnsonSort(vec);
-	fordJohnsonSort(lst);
-	std::cout << "After : " << vec << std::endl;
+	std::cout << "Before: " << a.getCont() << std::endl;
+	std::cout << "After : " << a.getSorted() << std::endl;
 }

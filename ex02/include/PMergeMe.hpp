@@ -33,6 +33,7 @@
 # include <list>
 # include <cstdlib>
 # include <algorithm>
+# include <ctime>
 
 # define _RED		"\e[1;91m"
 # define _GREEN		"\e[1;92m"
@@ -42,6 +43,35 @@
 # define _WHITE		"\e[1;97m"
 # define _RESET		"\e[0m"
 
+template <template <class, class > class T>
+class PMergeMe
+{
+
+public:
+
+	PMergeMe ( void );
+	PMergeMe ( T<int, std::allocator<int> > const & );
+	PMergeMe ( char * );
+	PMergeMe ( PMergeMe const & );
+	~PMergeMe ( void );
+
+	PMergeMe & operator= ( PMergeMe const & );
+
+	T<int, std::allocator<int> >	getCont ( void );
+	T<int, std::allocator<int> >	getSorted ( void );
+	time_t							getBeginTime ( void );
+
+	void	insertContent ( T<int, std::allocator<int> > const &);
+	void	fordJohnsonSort ( void );
+
+private:
+
+	T<int, std::allocator<int> >	cont_;
+	T<int, std::allocator<int> >	sorted_;
+	time_t	begin_;
+
+};
+
 
 bool	valChecking ( std::string values );
 
@@ -50,8 +80,6 @@ Iterator		nextIt ( Iterator current );
 template <class Iterator>
 Iterator		prevIt ( Iterator current );
 
-template <template <class, class> class T>
-void	fordJohnsonSort ( T<int, std::allocator<int> > & container );
 
 std::ostream &	operator<< ( std::ostream & o, std::vector<int> const & vec );
 std::ostream &	operator<< ( std::ostream & o, std::list<int> const & lst );
