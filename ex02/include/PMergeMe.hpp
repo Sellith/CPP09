@@ -31,17 +31,27 @@
 # include <sstream>
 # include <vector>
 # include <list>
-# include <utility>
 # include <cstdlib>
+# include <algorithm>
+
+# define _RED		"\e[1;91m"
+# define _GREEN		"\e[1;92m"
+# define _YELLOW	"\e[1;93m"
+# define _PURPLE	"\e[1;95m"
+# define _CYAN		"\e[1;96m"
+# define _WHITE		"\e[1;97m"
+# define _RESET		"\e[0m"
+
 
 bool	valChecking ( std::string values );
 
-template <class T>
-T				nextIt ( T current );
-
+template <class Iterator>
+Iterator		nextIt ( Iterator current );
+template <class Iterator>
+Iterator		prevIt ( Iterator current );
 
 template <template <class, class> class T>
-void			mergeInsertion ( T<int, std::allocator<int> > container );
+void	fordJohnsonSort ( T<int, std::allocator<int> > & container );
 
 std::ostream &	operator<< ( std::ostream & o, std::vector<int> const & vec );
 std::ostream &	operator<< ( std::ostream & o, std::list<int> const & lst );

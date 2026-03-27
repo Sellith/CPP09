@@ -24,37 +24,73 @@
 /*                                                                                                                 */
 /* *************************************************************************************************************** */
 
-template <class T>
-T	nextIt ( T current ) {
-	T next(current);
+
+#define	T_PAIR	T<std::pair<int, int>, std::allocator<std::pair<int, int> > >
+#define T_PAIRT	T<std::pair<int, int>, std::allocator<std::pair<int, int> > >::iterator
+#define T_INT	T<int, std::allocator<int> >
+#define T_INTCT	T<int, std::allocator<int> >::const_iterator
+
+template <typename Iterator>
+Iterator	nextIt ( Iterator current ) {
+	Iterator next(current);
 	++next;
 	return ( next );
 }
 
-template <template <class, class> class T>
-static T<std::pair<int, int>, std::allocator<std::pair<int, int> > >
-	pairing( T<int, std::allocator<int> > const & container )
+template <typename Iterator>
+Iterator	prevIt ( Iterator current ) {
+	Iterator prev(current);
+	--prev;
+	return ( prev );
+}
+
+template <typename T>
+static void	forEach ( T begin, T end, void(*f)(T) )
 {
-	T<std::pair<int, int>, std::allocator<std::pair<int, int> > > pairs;
-	for (typename T<int, std::allocator<int> >::const_iterator it = container.begin(); it != container.end() && nextIt(it) != container.end(); it++) {
-		typename T<int, std::allocator<int> >::const_iterator	itFirst = it++;
-		std::pair<int, int>										tmp (*itFirst, *it);
+	T it = begin;
+	while (it != end) {
+		f(it);
+		it++;
+	}
+}
+
+template <typename T>
+static void	pairSwap ( T it )
+{
+	if (it->first > it->second)
+		std::swap(it->first, it->second);
+}
+
+/* 
+	@brief The goal of this function is to recursively create new pairs, to sort them, 
+	then to separate between first and second into main and pending until size = 1
+ */
+
+template <template <class, class> class T>
+static void pairing( T_INT & container )
+{
+	if (container.size() == 1)
+		return ;
+
+	T_PAIR pairs;
+	for (typename T_INTCT it = container.begin(); it != container.end() && nextIt(it) != container.end(); it++) {
+		typename T_INTCT	itFirst = it++;
+		std::pair<int, int>	tmp (*itFirst, *it);
 		pairs.push_back(tmp);
 	}
-	return (pairs);
+	forEach(pairs.begin(), pairs.end(), pairSwap);
+	T_INT	mainCont;
+	T_INT	pendCont;
+	for (typename T_PAIRT it = pairs.begin(); it != pairs.end(); it++) {
+		mainCont.push_back(it->second);
+		pendCont.push_back(it->first);
+	}
+	std::cout << "mainCont is : " << mainCont << std::endl;
+	std::cout << "pendCont is : " << pendCont << std::endl;
 }
 
 template <template <class, class> class T>
-void	mergeInsertion ( T<int, std::allocator<int> > container )
+void	fordJohnsonSort ( T<int, std::allocator<int> > & container )
 {
-	T<std::pair<int, int>, std::allocator<std::pair<int, int> > >	pairs = pairing<T>(container);
-	T<int, std::allocator<int> >									lastValue;
-	if (container.size() % 2)
-		lastValue.push_back(container.back());
-	
-	for (typename T<std::pair<int, int>, std::allocator<std::pair<int, int> > >::const_iterator it = pairs.begin(); it != pairs.end(); it++) {
-		std::cout << "first: " << it->first << " second: " << it->second << std::endl;
-	}
-	if (container.size() % 2)
-		std::cout << lastValue << std::endl;
+	pairing<T>(container);
 }

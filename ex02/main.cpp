@@ -26,6 +26,10 @@
 
 #include "PMergeMe.hpp"
 
+#define TEST (function, message) \
+if (function) {std::cout << _GREEN << "Success: Containers is successfully sorted" << std::endl;} \
+else {std::cout << _RED << "Failure: Container is not sorted" << std::endl;}
+
 int	main ( int ac, char ** av )
 {
 	if (ac == 1) {
@@ -47,8 +51,7 @@ int	main ( int ac, char ** av )
 		}
 	}
 	std::cout << "Before: " << vec << std::endl;
-	std::cout << "vectors : \n";
-	mergeInsertion<std::vector>(vec);
-	std::cout << "lists : \n";
-	mergeInsertion<std::list>(lst);
+	fordJohnsonSort(vec);
+	fordJohnsonSort(lst);
+	std::cout << "After : " << vec << std::endl;
 }
