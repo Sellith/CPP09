@@ -87,6 +87,7 @@ static void pairing( T_INT & container )
 	}
 	std::cout << "mainCont is : " << mainCont << std::endl;
 	std::cout << "pendCont is : " << pendCont << std::endl;
+	pairing(mainCont);
 }
 
 template <template <class, class> class T>
