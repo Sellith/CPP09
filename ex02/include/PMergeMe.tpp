@@ -61,6 +61,7 @@ static void	pairSwap ( T it )
 		std::swap(it->first, it->second);
 }
 
+
 /* 
 	@brief The goal of this function is to recursively create new pairs, to sort them, 
 	then to separate between first and second into main and pending until size = 1
@@ -69,9 +70,6 @@ static void	pairSwap ( T it )
 template <template <class, class> class T>
 static void pairing( T_INT & container )
 {
-	if (container.size() == 1)
-		return ;
-
 	T_PAIR pairs;
 	for (typename T_INTCT it = container.begin(); it != container.end() && nextIt(it) != container.end(); it++) {
 		typename T_INTCT	itFirst = it++;
@@ -87,7 +85,13 @@ static void pairing( T_INT & container )
 	}
 	std::cout << "mainCont is : " << mainCont << std::endl;
 	std::cout << "pendCont is : " << pendCont << std::endl;
-	pairing(mainCont);
+	if (mainCont.size() > 2)
+		pairing(mainCont);
+	else {
+		std::swap(mainCont.front(), mainCont.back());
+		std::cout << mainCont <<std::endl;
+	}
+
 }
 
 template <template <class, class> class T>
