@@ -40,7 +40,7 @@ int	main ( int ac, char ** av )
 		return (1);
 
 	PMergeMe<std::vector>	a(av[1]);
-
 	std::cout << "Before: " << a.getCont() << std::endl;
+	a.fordJohnsonSort();
 	std::cout << "After : " << a.getSorted() << std::endl;
 }

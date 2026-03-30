@@ -130,8 +130,9 @@ void	PMergeMe<T>::insertContent ( T<int, std::allocator<int> > const & ctn )
  */
 
 template <template <class, class> class T>
-static void pairing( T_INT & container )
+static T_INT mergeInsertion( T_INT & container )
 {
+	std::cout << container << std::endl;
 	T_PAIR pairs;
 	for (typename T_INTCT it = container.begin(); it != container.end() && nextIt(it) != container.end(); it++) {
 		typename T_INTCT	itFirst = it++;
@@ -145,16 +146,24 @@ static void pairing( T_INT & container )
 		mainCont.push_back(it->second);
 		pendCont.push_back(it->first);
 	}
+	if (container.size() % 2)
+		pendCont.push_back(container.back());
+	T_INT newMain;
 	if (mainCont.size() > 2)
-		pairing(mainCont);
+		newMain = mergeInsertion(mainCont);
 	else {
 		std::swap(mainCont.front(), mainCont.back());
+		newMain = mainCont;
 	}
-
+	for (typename T_INT::reverse_iterator it = pendCont.rbegin(); it != pendCont.rend(); it++) {
+		newMain.push_back(*it);
+	}
+	std::cout << newMain << std::endl;
+	return ( newMain );
 }
 
 template <template <class, class> class T>
 void	PMergeMe<T>::fordJohnsonSort ( void )
 {
-	pairing<T>(cont_);
+	sorted_ = mergeInsertion<T>(cont_);
 }
