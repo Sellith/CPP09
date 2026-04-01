@@ -61,8 +61,7 @@ public:
 	T<int, std::allocator<int> >	getSorted ( void );
 	time_t							getBeginTime ( void );
 
-	void	insertContent ( T<int, std::allocator<int> > const &);
-	void	fordJohnsonSort ( void );
+	void							fordJohnsonSort ( void );
 
 private:
 
@@ -73,12 +72,15 @@ private:
 };
 
 
-bool	valChecking ( std::string values );
+bool			valChecking ( std::string values );
+unsigned long	jacobsthal ( unsigned long );
 
 template <class Iterator>
 Iterator		nextIt ( Iterator current );
 template <class Iterator>
 Iterator		prevIt ( Iterator current );
+template <typename Iterator>
+Iterator		moveIt ( Iterator current, int offset );
 
 
 std::ostream &	operator<< ( std::ostream & o, std::vector<int> const & vec );

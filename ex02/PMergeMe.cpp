@@ -37,6 +37,22 @@ bool	valChecking ( std::string values )
 	return (true);
 }
 
+/*
+    @brief Jacobsthal sequence:
+    J(n) = (2^(n+1) + (-1)^n) / 3
+
+    In this code:
+    (1 << (n + 1))           == 2^(n+1)
+    (n & 1)                  == n % 2
+    -(n & 1) + !(n & 1)      == (-1)^n   // parity trick
+
+    So the whole expression computes J(n+1)
+*/
+unsigned long	jacobsthal ( unsigned long n ) 
+{
+	return ((static_cast<unsigned long>(1 << (n + 1)) - (n & 1) + !(n & 1)) / 3);
+}
+
 std::ostream &	operator<< ( std::ostream & o, std::vector<int> const & vec )
 {
 	for (std::vector<int>::const_iterator it = vec.begin(); it != vec.end(); it++) {
