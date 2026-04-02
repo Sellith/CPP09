@@ -34,10 +34,19 @@
 # include <fstream>
 # include <map>
 
+# define _RED		"\e[1;91m"
+# define _GREEN		"\e[1;92m"
+# define _YELLOW	"\e[1;93m"
+# define _PURPLE	"\e[1;95m"
+# define _CYAN		"\e[1;96m"
+# define _WHITE		"\e[1;97m"
+# define _RESET		"\e[0m"
+
 enum e_errors {
 	INVALID		= -1,
 	NEGATIVE	= -2,
-	TOO_LARGE	= -3
+	TOO_LARGE	= -3,
+	BAD_DATE	= -4
 };
 
 class parsingError : public std::exception

@@ -41,8 +41,8 @@ static int dateChecking ( std::string date, char separation)
 			return (INVALID);
 		strYear += date[len++];
 	}
-	if (!date[len])
-		return (INVALID);
+	if (!date[len] || len != 4)
+		return (BAD_DATE);
 	year = std::atoi(strYear.c_str());
 	len++;
 	while (date[len] != '-'  && date[len]) {
@@ -52,15 +52,13 @@ static int dateChecking ( std::string date, char separation)
 	}
 	month = std::atoi(strMonth.c_str());
 	if (month > 12 || month < 1 || !date[len])
-		return (INVALID);
+		return (BAD_DATE);
 	len++;
 	while (date[len] != separation  && date[len]) {
 		if (!std::isdigit(date[len]))
 			return (INVALID);
 		strDay += date[len++];
 	}
-	if (!date[len])
-		return (INVALID);
 	day = std::atoi(strDay.c_str());
 
 	int		year_nonleap[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -69,12 +67,13 @@ static int dateChecking ( std::string date, char separation)
 
 	if ( !is_leap ) {
 		if (day < 1 || year_nonleap[month - 1] < day)
-			return (INVALID);
+			return (BAD_DATE);
 	}
 	else
 		if (day < 1 || year_leap[month - 1] < day)
-			return (INVALID);
-			
+			return (BAD_DATE);
+	if (!date[len])
+		return (INVALID);
 	return (len);
 }
 
@@ -89,7 +88,7 @@ static std::map<std::string, float> dataParsing ( std::ifstream & p_data )
 	getline(p_data,ctn);
 	while (getline(p_data, ctn)) {
 		dateLen = dateChecking(ctn, ',');
-		if (dateLen == INVALID)	
+		if (dateLen == INVALID || dateLen == BAD_DATE)	
 			throw (parsingError("data.csv", line, ctn));
 		else {
 			int	decimal = 0;
@@ -114,24 +113,27 @@ static void	algorithm ( std::map<std::string, float> p_data, std::string p_infDa
 	switch (static_cast<int>(p_value))
 	{
 	case INVALID:
-		std::cout << "Error: bad input => " << p_infDate << "\n";
+		std::cout << _RED << "Error: bad input \t\t=> " << p_infDate << "\n";
 		return ;
 	case NEGATIVE:
-		std::cout << "Error: not a positive number" << "\n";
+		std::cout << _RED << "Error: not a positive number \t=> " << p_value << "\n";
 		return ;
 	case TOO_LARGE:
-		std::cout << "Error: too large of a number" << "\n";
+		std::cout << _RED << "Error: too large of a number \t=> " << p_value << "\n";
+		return ;
+	case BAD_DATE:
+		std::cout << _RED << "Error: bad date format \t\t=> " << p_infDate << "\n";
 		return ;
 	}
 	std::map<std::string, float>::iterator it = p_data.begin();
 	if (std::strcmp(it->first.c_str(), p_infDate.c_str()) > 0) {
-		std::cout << "Error: date too low (" << it->first << " -> " << p_infDate << ")" "\n";
+		std::cout << _RED << "Error: date too low \t\t=> (" << it->first << " -> " << p_infDate << ")" "\n";
 		return ;
 	}
 	while (it != p_data.end()) {
 		if (std::strcmp(it->first.c_str(), p_infDate.c_str()) > 0) {
 			it--;
-			std::cout << it->first << " => " << p_value << " = " << it->second * p_value << "\n";
+			std::cout << _CYAN << p_infDate << " => " << p_value << " = " << it->second * p_value << "\n";
 			return ;
 		}
 		it++;
@@ -157,7 +159,11 @@ static void	infileParsing ( std::ifstream & p_ifs, std::map<std::string, float> 
 			algorithm(p_data, ctn, val);
 			continue ;
 		}
-		if (dateLen == INVALID || ctn[dateLen + 1] != '|' || ctn[dateLen + 2] != ' ') {
+		if (dateLen == BAD_DATE) {
+			algorithm(p_data, ctn, dateLen);
+			continue ;
+		}
+		if (dateLen == INVALID || dateLen == BAD_DATE || ctn[dateLen + 1] != '|' || ctn[dateLen + 2] != ' ') {
 			val = INVALID;
 			algorithm(p_data, ctn, val);
 			continue ;
