@@ -39,8 +39,25 @@ int	main ( int ac, char ** av )
 	if (!valChecking(av[1]))
 		return (1);
 
-	PMergeMe<std::vector>	a(av[1]);
-	std::cout << "Before: " << a.getCont() << std::endl;
-	a.fordJohnsonSort();
-	std::cout << "After : " << a.getSorted() << std::endl;
+	{
+		PMergeMe<std::vector>	vec(av[1]);
+		std::cout << "Before\t: " << vec.getCont() << std::endl;
+		vec.fordJohnsonSort();
+		std::cout << "After \t: " << vec.getSorted() << std::endl;
+		std::cout << "Time to process a range of " 
+			<< vec.getSize() << " with std::vector : "
+			<< vec.getTimestamp() << " ms" << std::endl;
+	}
+
+	std::cout << "\n";
+
+	{
+		PMergeMe<std::list>	lst(av[1]);
+		std::cout << "Before\t: " << lst.getCont() << std::endl;
+		lst.fordJohnsonSort();
+		std::cout << "After \t: " << lst.getSorted() << std::endl;
+		std::cout << "Time to process a range of " 
+			<< lst.getSize() << " with std::list : " 
+			<< lst.getTimestamp() << " ms" << std::endl;
+	}
 }

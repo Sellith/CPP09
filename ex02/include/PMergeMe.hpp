@@ -57,9 +57,10 @@ public:
 
 	PMergeMe & operator= ( PMergeMe const & );
 
-	T<int, std::allocator<int> >	getCont ( void );
-	T<int, std::allocator<int> >	getSorted ( void );
-	time_t							getBeginTime ( void );
+	T<int, std::allocator<int> >	getCont ( void ) const;
+	T<int, std::allocator<int> >	getSorted ( void ) const;
+	double							getTimestamp ( void ) const;
+	int								getSize ( void ) const;
 
 	void							fordJohnsonSort ( void );
 
@@ -67,7 +68,7 @@ private:
 
 	T<int, std::allocator<int> >	cont_;
 	T<int, std::allocator<int> >	sorted_;
-	time_t	begin_;
+	double	timestamp_;
 
 };
 
